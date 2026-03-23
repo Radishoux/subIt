@@ -158,6 +158,27 @@ function bindEvents() {
   });
 }
 
+async function requestMicPermission() {
+  // Chrome only shows the mic permission prompt when getUserMedia is called
+  // from a visible extension page (sidepanel). Offscreen documents and service
+  // workers cannot trigger the prompt — so we request it here first.
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    // Immediately stop the tracks — we only needed the permission grant
+    stream.getTracks().forEach((t) => t.stop());
+    return true;
+  } catch (err) {
+    if (err.name === 'NotAllowedError') {
+      setStatusText('Microphone access denied. Click the 🔒 icon in the address bar of the sidepanel and allow microphone.');
+      setStatus('error', 'Error');
+    } else {
+      setStatusText(`Mic error: ${err.message}`);
+      setStatus('error', 'Error');
+    }
+    return false;
+  }
+}
+
 async function toggleListening() {
   if (isListening) {
     setStatusText('Stopping...');
@@ -170,6 +191,11 @@ async function toggleListening() {
       setStatusText('No active tab found');
       return;
     }
+
+    // Trigger the mic permission prompt from the sidepanel before anything else
+    setStatusText('Requesting microphone permission...');
+    const granted = await requestMicPermission();
+    if (!granted) return;
 
     setStatusText('Starting...');
     const response = await chrome.runtime.sendMessage({
