@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- Open this file in a browser to generate PNG icons.
+     Right-click each canvas and "Save image as" → icon16/48/128.png -->
+<html>
+<head><title>Generate Icons</title></head>
+<body>
+<script>
+[16, 48, 128].forEach(size => {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#5b8cff';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, size, size, size * 0.2);
+  ctx.fill();
+
+  // Globe-ish circle
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = size * 0.08;
+  ctx.beginPath();
+  ctx.arc(size/2, size/2, size * 0.32, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Horizontal line
+  ctx.beginPath();
+  ctx.moveTo(size * 0.15, size * 0.5);
+  ctx.lineTo(size * 0.85, size * 0.5);
+  ctx.stroke();
+
+  canvas.title = `icon${size}.png`;
+  document.body.appendChild(canvas);
+  document.body.appendChild(document.createTextNode(` icon${size}.png  `));
+});
+</script>
+</body>
+</html>

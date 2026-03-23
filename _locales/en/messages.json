@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "LinguaLive",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "Real-time audio translation subtitle overlay for any browser tab",
+    "description": "Extension description"
+  }
+}

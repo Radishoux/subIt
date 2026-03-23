@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "LinguaLive",
+  "version": "1.0.0",
+  "description": "Real-time audio translation subtitle overlay for any browser tab",
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "tabCapture",
+    "offscreen",
+    "storage",
+    "scripting",
+    "alarms"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "LinguaLive",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en"
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LinguaLive Offscreen</title>
+</head>
+<body>
+  <!--
+    Offscreen document: handles audio capture + speech recognition.
+    MV3 offscreen documents can access getUserMedia and Web Speech API
+    even though service workers cannot.
+  -->
+  <script type="module" src="offscreen.js"></script>
+</body>
+</html>

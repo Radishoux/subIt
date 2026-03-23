@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinguaLive</title>
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🌐</span>
+      <span class="logo-text">LinguaLive</span>
+    </div>
+    <div id="status-badge" class="status-badge idle">Idle</div>
+  </header>
+
+  <!-- Section 1: Language Selection -->
+  <section class="card" id="section-languages">
+    <h2 class="section-title">Languages</h2>
+    <div class="lang-row">
+      <div class="lang-group">
+        <label for="src-lang">From</label>
+        <select id="src-lang">
+          <option value="auto">Auto-detect</option>
+        </select>
+      </div>
+      <button id="swap-btn" class="icon-btn" title="Swap languages">⇄</button>
+      <div class="lang-group">
+        <label for="tgt-lang">To</label>
+        <select id="tgt-lang"></select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Controls -->
+  <section class="card" id="section-controls">
+    <button id="listen-btn" class="listen-btn">
+      <span class="mic-icon">🎤</span>
+      <span id="listen-label">Start Listening</span>
+    </button>
+    <p id="status-text" class="status-text">Ready</p>
+  </section>
+
+  <!-- Section 3: Subtitle Settings -->
+  <section class="card" id="section-settings">
+    <h2 class="section-title">Subtitle Settings</h2>
+
+    <div class="setting-row">
+      <label>Lines displayed</label>
+      <div class="segmented" id="lines-control">
+        <button data-value="1">1</button>
+        <button data-value="2">2</button>
+        <button data-value="3" class="active">3</button>
+        <button data-value="4">4</button>
+        <button data-value="5">5</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <label>Font size</label>
+      <div class="segmented" id="fontsize-control">
+        <button data-value="small">S</button>
+        <button data-value="medium" class="active">M</button>
+        <button data-value="large">L</button>
+        <button data-value="xl">XL</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <label>Position</label>
+      <div class="segmented" id="position-control">
+        <button data-value="bottom" class="active">Bottom</button>
+        <button data-value="top">Top</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <label>Opacity <span id="opacity-value">85%</span></label>
+      <input type="range" id="opacity-slider" min="50" max="100" value="85" />
+    </div>
+  </section>
+
+  <!-- Section 4: Language Packs -->
+  <section class="card" id="section-packs">
+    <h2 class="section-title">Language Packs</h2>
+    <p class="hint">Download offline models for instant translation.</p>
+    <ul id="packs-list" class="packs-list"></ul>
+  </section>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
