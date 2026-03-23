@@ -49,30 +49,29 @@ async function handleStart({ streamId, srcLang, tgtLang }) {
 
   LOG(`Starting capture: ${srcLang} → ${tgtLang}`);
 
-  try {
-    // Strategy 1: use the tab capture stream ID provided by background.js
-    // This gives us a MediaStream for the active tab's audio
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
+  if (streamId) {
+    try {
+      // Tab capture: use the stream ID obtained by background.js via chrome.tabCapture.
+      // MV3 passes the stream ID here; we use getUserMedia with chromeMediaSource.
+      // Note: 'mandatory' constraints are deprecated — use the flat audio object.
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
           chromeMediaSource: 'tab',
           chromeMediaSourceId: streamId,
         },
-      },
-      video: false,
-    });
-
-    LOG('Tab audio stream acquired');
-  } catch (err) {
-    LOG('Tab capture failed, falling back to mic:', err.message);
-    // Fallback: user's microphone
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    } catch (fallbackErr) {
-      sendStatus('Error: could not capture audio');
-      LOG('Mic fallback also failed:', fallbackErr.message);
+        video: false,
+      });
+      LOG('Tab audio stream acquired');
+    } catch (err) {
+      LOG('Tab capture failed:', err.name, err.message);
+      sendStatus(`Tab capture failed: ${err.message}`);
+      isRunning = false;
       return;
     }
+  } else {
+    sendStatus('No stream ID — could not capture tab audio');
+    isRunning = false;
+    return;
   }
 
   // Pre-load the translation model in a non-blocking way
