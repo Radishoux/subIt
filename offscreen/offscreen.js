@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((message) => {
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
-async function handleStart({ streamId, srcLang, tgtLang }) {
+async function handleStart({ tabId, srcLang, tgtLang }) {
   if (isRunning) {
     LOG('Already running, restarting with new config');
     handleStop();
@@ -47,29 +47,33 @@ async function handleStart({ streamId, srcLang, tgtLang }) {
   currentTgtLang = tgtLang;
   isRunning      = true;
 
-  LOG(`Starting capture: ${srcLang} → ${tgtLang}`);
+  LOG(`Starting capture: ${srcLang} → ${tgtLang}, tabId: ${tabId}`);
 
-  if (streamId) {
-    try {
-      // Tab capture: use the stream ID obtained by background.js via chrome.tabCapture.
-      // MV3 passes the stream ID here; we use getUserMedia with chromeMediaSource.
-      // Note: 'mandatory' constraints are deprecated — use the flat audio object.
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          chromeMediaSource: 'tab',
-          chromeMediaSourceId: streamId,
-        },
-        video: false,
+  try {
+    // Get stream ID here, immediately before getUserMedia, to prevent expiry.
+    // Stream IDs from getMediaStreamId are short-lived — fetching and consuming
+    // them in the same async chain avoids the "Permission dismissed" error.
+    const streamId = await new Promise((resolve, reject) => {
+      chrome.tabCapture.getMediaStreamId({ targetTabId: tabId }, (id) => {
+        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+        else resolve(id);
       });
-      LOG('Tab audio stream acquired');
-    } catch (err) {
-      LOG('Tab capture failed:', err.name, err.message);
-      sendStatus(`Tab capture failed: ${err.message}`);
-      isRunning = false;
-      return;
-    }
-  } else {
-    sendStatus('No stream ID — could not capture tab audio');
+    });
+
+    LOG('Got stream ID:', streamId);
+
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        chromeMediaSource: 'tab',
+        chromeMediaSourceId: streamId,
+      },
+      video: false,
+    });
+
+    LOG('Tab audio stream acquired');
+  } catch (err) {
+    LOG('Tab capture failed:', err.name, err.message);
+    sendStatus(`Tab capture failed: ${err.message}`);
     isRunning = false;
     return;
   }

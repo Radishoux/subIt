@@ -47,22 +47,6 @@ async function closeOffscreenDocument() {
   }
 }
 
-// ─── Tab Capture ──────────────────────────────────────────────────────────────
-
-async function startTabCapture(tabId) {
-  return new Promise((resolve, reject) => {
-    // tabCapture.getMediaStreamId produces a stream ID the offscreen doc can use
-    // This is the MV3-compatible approach for capturing tab audio
-    chrome.tabCapture.getMediaStreamId({ targetTabId: tabId }, (streamId) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError.message);
-      } else {
-        resolve(streamId);
-      }
-    });
-  });
-}
-
 // ─── Message Router ───────────────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -127,20 +111,17 @@ async function handleStartListening({ srcLang, tgtLang, tabId }) {
   try {
     await ensureOffscreenDocument();
 
-    // Get stream ID for tab capture
-    // Tab capture is the practical MV3 approach; system-wide capture would need native messaging
-    const streamId = await startTabCapture(tabId);
-
     // Inject content script to host the overlay
     await chrome.scripting.executeScript({
       target: { tabId },
       files: ['content/content.js'],
     });
 
-    // Tell offscreen doc to start capturing + recognising
+    // Pass tabId to offscreen doc so it can call getMediaStreamId itself,
+    // immediately before getUserMedia — avoids the stream ID expiring in transit
     chrome.runtime.sendMessage({
       type: 'OFFSCREEN_START',
-      payload: { streamId, srcLang, tgtLang },
+      payload: { tabId, srcLang, tgtLang },
     });
 
     // Update storage
